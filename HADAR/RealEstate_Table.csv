@@ -1,0 +1,101 @@
+Field Number,Field Name,Field Start Position,Field Length,Data Type,Description,Notes
+1,MapRefNo,1,10,Text,Map Reference Number:  unique ID for map parcel,No Dashes!!!
+2,GeoRefNo,11,10,Text,Geo Reference Number:  non-unique ID for property,No Dashes!!!
+3,Tier,21,6,Integer,Tier,Did not bring in when converting to TylerX
+4,Range,27,6,Integer,Range,Did not bring in when converting to TylerX
+5,Prop_Addr,33,255,Text,Complete Property Address (7 fields concatenated & trimmed),
+6,ZngCdPr,288,5,Text,"Zoning Code, Primary",
+7,ZngCdSc,293,5,Text,"Zoning Code, Secondary",
+8,ZngOLPr,298,5,Text,"Zoning Code -- P & Z Overlay/Floating, Primary",
+9,ZngOLSc,303,5,Text,"Zoning Code -- P & Z Overlay/Floating, Secondary",
+10,ClassPr_S,308,11,Text,"Assessor Classification, Primary",
+11,ClassSc_S,319,50,Text,"Assessor Classification, Secondary",First space blank
+12,Legal_Pr,369,34,Text,"Legal Description, Primary (Brief)",
+13,Legal_Sc,403,34,Text,"Legal Description, Secondary (Brief)",
+14,SchD_S,437,6,Integer,School District -- Assessor Year,First two spaces blank
+15,TxD_S,443,6,Integer,Tax District -- Assessor Year,First two spaces blank
+16,MA_Ownr1,449,34,Text,"Mailing Address, Owner 1",Owner Name 1
+17,MA_Ownr2,483,34,Text,"Mailing Address, Owner 2",Owner Name 2
+18,MA_Line1,517,34,Text,"Mailing Address, Line 1 (if any)",Company Name or C/O
+19,MA_Line2,551,34,Text,"Mailing Address, Line 2",Street Address
+20,MA_City,585,20,Text,"Mailing Address, City",
+21,MA_State,605,2,Text,"Mailing Address, State",
+22,MA_Zip1,607,6,Text,"Mailing Address, Zip",
+23,MA_Zip2,613,6,Text,"Mailing Address, Zip Pre-Sort",
+24,Rcrd_Yr,619,6,Integer,Year of Last Recorded Deed,First space blank
+25,Rcrd_Mo,625,3,Byte,Month of Last Recorded Deed,First space blank
+26,Inst1_No,628,10,Text,Instrument Number Last Recorded,
+27,Inst1_Yr,638,6,Integer,Year of Last Instrument,First space blank
+28,Inst1_Mo,644,3,Byte,Month of Last Instrument,First space blank
+29,Inst1TPr,647,3,Text,"Instrument Type, Primary",
+30,Inst1TSc,650,3,Text,"Instrument Type, Secondary",
+31,LndAc_S,653,11,Long Integer,Land Value -- Assessor Year,
+32,ImpAc_S,664,11,Long Integer,Improvement Value -- Assessor Year,NOT dwelling value since conversion to TylerX
+33,OthAc_S,675,11,Long Integer,Other Value -- Assessor Year,Dwelling value since conversion to TylerX
+34,TtlVal_AsrYr,686,11,Long Integer,Total Value -- Assessor Year,
+35,ValType,697,19,Text,Value Type,"F=Full, P=Partial, T=Pro-Rate, L=Plat, C=Court, A=PAAB, B=BdOfRvw, I=InformalRvw, Q=Equalization"
+36,X1TPr_D,716,1,Text,"Exemption 1 Type, Primary -- Auditor Year",
+37,X1TSc_D,717,4,Text,"Exemption 1 Type, Secondary -- Auditor Year",
+38,X2TPr_D,721,1,Text,"Exemption 2 Type, Primary -- Auditor Year",
+39,X2TSc_D,722,4,Text,"Exemption 2 Type, Secondary -- Auditor Year",
+40,XTAddl_D,726,1,Text,"Exemption Type, Additional -- Auditor Year",
+41,X1TPr_S,727,1,Text,"Exemption 1 Type, Primary -- Assessor Year",
+42,X1TSc_S,728,4,Text,"Exemption 1 Type, Secondary -- Assessor Year",
+43,X2TPr_S,732,1,Text,"Exemption 2 Type, Primary -- Assessor Year",
+44,X2TSc_S,733,4,Text,"Exemption 2 Type, Secondary -- Assessor Year",
+45,XTAddl_S,737,1,Text,"Exemption Type, Additional -- Assessor Year","""Y,"" if more than 2"
+46,LndAcX1S,738,11,Long Integer,"Exemption 1 Amount, Land -- Assessor Year",
+47,LndAcX2S,749,11,Long Integer,"Exemption 2 Amount, Land -- Assessor Year",
+48,ImpAcX1S,760,11,Long Integer,"Exemption 1 Amount, Improvements -- Assessor Year",
+49,ImpAcX2S,771,11,Long Integer,"Exemption 2 Amount, Improvements -- Assessor Year",
+50,OthAcX1S,782,11,Long Integer,"Exemption 1 Amount, Other -- Assessor Year",
+51,OthAcX2S,793,11,Long Integer,"Exemption 2 Amount, Other -- Assessor Year",
+52,HSVal_D,804,11,Long Integer,Homestead Credit Amount -- Auditor Year,
+53,MilVal_D,815,11,Long Integer,Military Exemption Amount -- Auditor Year,
+54,HSVal_S,826,11,Long Integer,Homestead Credit Amount -- Assessor Year,
+55,MilVal_S,837,11,Long Integer,Military Exemption Amount -- Assessor Year,
+56,TxNet,848,22,Double,"Taxes, Net Amount",
+57,TxGross,870,22,Double,"Taxes, Gross Amount",
+58,AcreX_S1,892,22,Double,"Acres, Exemption 1 -- Assessor Year",
+59,AcreX_S2,914,22,Double,"Acres, Exemption 2 -- Assessor Year",
+60,AcreGr,936,22,Double,"Acres, Gross",
+61,AcreNt_S,958,22,Double,"Acres, Net -- Assessor Year",
+62,LotArea,980,11,Long Integer,Lot Area,Only on residential parcels
+63,ParType,991,7,Text,"Parcel Type:  ""Dwelling & Lot,"" "" 2nd Dwelling,"" ""Building & Lot,"" ""Vacant Lot""",Only on residential parcels
+64,BldgNo_S,998,6,Integer,Number of Buildings -- Assessor Year,Not on residential parcels
+65,DwlgNo_S,1004,6,Integer,Number of Dwellings/Units -- Assessor Year,
+66,BldgType,1010,7,Text,"""1-Family Detached,"" ""Condo,"" ""Townhouse End Unit,"" ""Townhouse Inner Unit,"" ""Duplex,"" 2-Family Conversion,"" ""3-Family Conversion,"" ""4-Family Conversion,"" ""5 or more-Family Conversion,"" ""Apartments + Rooms""",Only on residential construction
+67,YrBuilt,1017,6,Integer,Year House Built,Only on residential construction
+68,HouseStyle,1023,7,Text,"""1-Story,"" ""2-Story,"" ""Split-Level,"" ""Split-Foyer,"" ""1.5-Story w/Fin'd. 2nd Flr,"" ""1.5-Story w/UF 2nd Flr,"" ""2.5-Story w/Fin'd. 3nd Flr,"" ""2.5-Story w/UF 3nd Flr,"" ""3-Story""",Only on residential construction
+69,Foundation,1030,7,Text,Foundation Type,Only on residential construction
+70,RoofMatl,1037,7,Text,Roof Material,Only on residential construction
+71,Ext1,1044,7,Text,"Siding Material, Primary",Only on residential construction
+72,Ext2,1051,7,Text,"Siding Material, Secondary",Only on residential construction
+73,MasVnrType,1058,7,Text,Masonry Veneer Material,Only on residential construction
+74,Heating,1065,7,Text,Heating Type,Only on residential construction
+75,Central Air,1072,7,Text,"Central Air:  ""Yes"" or ""No""",Only on residential construction
+76,GLA,1079,6,Integer,Amount of Gross Living Area,Only on residential construction
+77,TtlBsmtSF,1085,6,Integer,Total Amount of Basement Area,Only on residential construction
+78,TotRmsAbvGrd,1091,3,Byte,Amount of Rooms Above-Grade,Only on residential construction
+79,Fireplaces,1094,3,Byte,Number of Fireplaces,Only on residential construction
+80,PoolArea,1097,6,Integer,Area of Pool,Only on residential construction
+81,GarageType,1103,7,Long Integer,"""Attachd,"" ""Detachd,"" ""Basment,"" ""BuiltIn,"" ""Carport,"" ""2 Types,"" ""None""",Only on residential construction
+82,GarYrBlt,1110,6,Long Integer,Year Garage was Built,Only on residential construction
+83,Cars,1116,22,Long Integer,Number of Cars (side-by-side) Garage Holds,Only on residential construction
+84,GarageArea,1138,6,Text,Area of Garage,Only on residential construction
+85,YrSold_YYYY,1144,11,Long Integer,Year of Sale,From Residential Sales File
+86,MoSold_MM,1155,11,Long Integer,Month of Sale,From Residential Sales File
+87,SalePrice,1166,11,Long Integer,Price of Sale,From Residential Sales File
+88,SaleType,1177,7,Text,Type or Terms of Sale (or Allocation of Value for sale of multiple buildings or multiple parcels),From Residential Sales File
+89,SaleCond,1184,7,Text,"Sales Condition:  ""Normal Sale,"" ""Partial Assessment"" (at time of sale), ""Family Sale,"" ""Abnormal Sale""",From Residential Sales File
+90,ParclRel,1191,2,Text,Parcel Relationship Code,M=Mailing; T=Trustee; TA=Trustee Additional; C=Contract; CA=Contract Additional; D=Deed; DA=Deed Additional
+91,PA-Nmbr,1193,6,Text,House Number -- Property Address,Part of Property Address
+92,PA-PreD,1199,2,Text,Pre-Directional for Street -- Property  Address,Part of Property Address
+93,PA-Strt,1201,20,Text,Street Name -- Property Address,Part of Property Address
+94,PA-StSfx,1221,4,Text,Street Suffix -- Property Address,Part of Property Address
+95,PA-PostD,1225,2,Text,Post-Directional for Street -- Property  Address,Part of Property Address
+96,PA-UnTyp,1227,4,Text,Unit Type -- Property Address,Part of Property Address
+97,PA-UntNo,1231,4,Text,Unit Number -- Property Address,"Part of Property Address (e.g. apts., condos, suites)"
+98,Date,1235,9,Date/Time,Date Queried,(Not sure if field length of 9 will work or not; may need to be longer)
+99,Source,1245,18,Text,Ames City Assessor,
+100,NmbrBRs,1263,3,Byte,Number of Above Grade Bedrooms,Basement BRs are not tracked in this DB
