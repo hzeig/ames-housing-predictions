@@ -22,7 +22,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 1,
+   "execution_count": 169,
    "id": "6d631296",
    "metadata": {
     "scrolled": true
@@ -47,7 +47,7 @@
     "from sklearn.preprocessing import StandardScaler, LabelEncoder\n",
     "from sklearn import utils\n",
     "from sklearn.pipeline import Pipeline\n",
-    "from sklearn.model_selection import StratifiedKFold, train_test_split, cross_val_score\n",
+    "from sklearn.model_selection import KFold, train_test_split, cross_val_score\n",
     "from sklearn.ensemble import GradientBoostingRegressor\n",
     "from catboost import CatBoostClassifier\n",
     "# from lightgbm import LGBMRegressor\n",
@@ -7807,7 +7807,8 @@
     "### Transform Cyclical Features with Cosine and Sine Wave\n",
     "- Months are cyclical, due to seasonal changes\n",
     "- A negative cosine wave (y=-cos(x)) can represent this pattern, where month 1 and month 12 are similar and start from the same point high values mean hot and low values mean cold\n",
-    "- $cos(x)$ and $sin(x)$"
+    "- $cos(x)$ and $sin(x)$\n",
+    "- Stored in separate set, to compare model scores to see if actually makes significant improvement "
    ]
   },
   {
@@ -7835,7 +7836,7 @@
    "id": "30d98b60-4f77-4fb7-ac52-da0eab662a86",
    "metadata": {},
    "source": [
-    "## Standardization / Standard Scaling"
+    "### Standardization / Standard Scaling"
    ]
   },
   {
@@ -8259,7 +8260,7 @@
     "tags": []
    },
    "source": [
-    "# Modeling"
+    "# Modeling I"
    ]
   },
   {
@@ -8293,7 +8294,7 @@
    "id": "0747d09a-2a24-4a67-bcbb-3f1c0ccde509",
    "metadata": {},
    "source": [
-    "### Multiple Linear Regression"
+    "## Multiple Linear Regression I"
    ]
   },
   {
@@ -8400,10 +8401,117 @@
   },
   {
    "cell_type": "markdown",
+   "id": "44f8a808-7f89-4dd0-a4c4-9cedeee1e944",
+   "metadata": {},
+   "source": [
+    "#### Train Test Split"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 125,
+   "id": "0ea34640-d022-4286-a97b-00fe922e9804",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train, X_test, y_train, y_test = train_test_split(\n",
+    "    features, target, test_size=0.5, random_state=0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 162,
+   "id": "427d5654-de57-409e-a75e-85cc56418e95",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "R^2 train 0.9481267645891195\n",
+      "R^2 test -5.176200370275267e+22\n"
+     ]
+    }
+   ],
+   "source": [
+    "ols = LinearRegression()\n",
+    "ols.fit(X_train, y_train)\n",
+    "print('R^2 train', ols.score(X_train, y_train))\n",
+    "print('R^2 test', ols.score(X_test, y_test))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "521b442c-19fb-479e-9c1d-3589a7111c13",
+   "metadata": {},
+   "source": [
+    "#### K-fold Split and Cross Validation"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 178,
+   "id": "38f26f91-8f2e-4c57-b69c-30eaea1e8b08",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "5"
+      ]
+     },
+     "execution_count": 178,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# split training data into 5 parts for cross-validation\n",
+    "kfold = KFold(n_splits=5, shuffle=True, random_state=0)\n",
+    "kfold.get_n_splits(X_train, y_train) # see that split worked"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 179,
+   "id": "5b1fbe4a-b7e6-4935-be41-97876b3fb7da",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[-1.78475557e+23 -2.89923605e+18 -1.47945895e+21 -4.47879758e+22\n",
+      " -3.37864430e+19]\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "-4.495593543735972e+22"
+      ]
+     },
+     "execution_count": 179,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "lm = LinearRegression()\n",
+    "scores = cross_val_score(lm, X_train, y_train, cv=kfold)\n",
+    "print(scores)\n",
+    "np.mean(scores)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
    "id": "41e96769-5a1a-4f75-84a1-e8cfc44f40a4",
    "metadata": {},
    "source": [
-    "### Feature Selection"
+    "# Feature Selection\n",
+    "- Filter (VIF)\n",
+    "- Wrapper (RFE)\n",
+    "- Embedding"
    ]
   },
   {
@@ -8569,17 +8677,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
-   "id": "e5a9d09e-11fb-4364-aa9f-98d43b72c779",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "sev_corr = vif['variable'].loc[vif['VIF'] > 5] # severe correlation"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 155,
+   "execution_count": 182,
    "id": "4e5e8055-b662-4b99-a1c0-fc80d97548a7",
    "metadata": {},
    "outputs": [
@@ -8589,15 +8687,16 @@
        "(2580, 119)"
       ]
      },
-     "execution_count": 155,
+     "execution_count": 182,
      "metadata": {},
      "output_type": "execute_result"
     }
    ],
    "source": [
-    "fiveplus_vif = vif['variable'].loc[vif['VIF'] > 5]\n",
-    "Xvif = X.loc[:,~X.columns.isin(fiveplus_vif)]\n",
-    "Xvif.shape"
+    "# explude features with severe correlation - VIF score over 5\n",
+    "sev_corr = vif['variable'].loc[vif['VIF'] > 5]\n",
+    "hpVif = X.loc[:,~X.columns.isin(sev_corr)]\n",
+    "hpVif.shape                                # stil needs to be split / kfold for cross-validation"
    ]
   },
   {
@@ -8605,7 +8704,7 @@
    "id": "636eb29e-3558-4781-b84f-847081656a6b",
    "metadata": {},
    "source": [
-    "#### Wrapper Method"
+    "#### Recursive Feature Elimination"
    ]
   },
   {
@@ -8614,128 +8713,87 @@
    "id": "185c9149-343e-4187-a8d2-a292645c5e32",
    "metadata": {},
    "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "markdown",
-   "id": "44f8a808-7f89-4dd0-a4c4-9cedeee1e944",
-   "metadata": {},
    "source": [
-    "#### Train Test Split"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 125,
-   "id": "0ea34640-d022-4286-a97b-00fe922e9804",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "X_train, X_test, y_train, y_test = train_test_split(\n",
-    "    features, target, test_size=0.5, random_state=0)"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 162,
-   "id": "427d5654-de57-409e-a75e-85cc56418e95",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "R^2 train 0.9481267645891195\n",
-      "R^2 test -5.176200370275267e+22\n"
-     ]
-    }
-   ],
-   "source": [
-    "ols = LinearRegression()\n",
-    "ols.fit(X_train, y_train)\n",
-    "print('R^2 train', ols.score(X_train, y_train))\n",
-    "print('R^2 test', ols.score(X_test, y_test))"
+    "from sklearn.feature_selection import RFE, RFECV\n",
+    "\n",
+    "names = pd.DataGrame(X_train.columns)\n",
+    "\n",
+    "lm = LinearRegression()\n",
+    "\n",
+    "rfe = RFE(lm, 5, step=1)"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "521b442c-19fb-479e-9c1d-3589a7111c13",
+   "id": "e21132d2-3fab-4b1b-a2ea-b1d3a6c64278",
    "metadata": {},
    "source": [
-    "#### K-fold Split"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 166,
-   "id": "38f26f91-8f2e-4c57-b69c-30eaea1e8b08",
-   "metadata": {},
-   "outputs": [
-    {
-     "ename": "ValueError",
-     "evalue": "Supported target types are: ('binary', 'multiclass'). Got 'continuous' instead.",
-     "output_type": "error",
-     "traceback": [
-      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
-      "\u001b[1;31mValueError\u001b[0m                                Traceback (most recent call last)",
-      "\u001b[1;32m<ipython-input-166-89100baa122b>\u001b[0m in \u001b[0;36m<module>\u001b[1;34m\u001b[0m\n\u001b[0;32m      2\u001b[0m \u001b[0mskfold\u001b[0m \u001b[1;33m=\u001b[0m \u001b[0mStratifiedKFold\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mn_splits\u001b[0m\u001b[1;33m=\u001b[0m\u001b[1;36m5\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mshuffle\u001b[0m\u001b[1;33m=\u001b[0m\u001b[1;32mTrue\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mrandom_state\u001b[0m\u001b[1;33m=\u001b[0m\u001b[1;36m0\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m      3\u001b[0m \u001b[0mskfold\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mget_n_splits\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX_train\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my_train\u001b[0m\u001b[1;33m)\u001b[0m \u001b[1;31m# see that split worked\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m----> 4\u001b[1;33m \u001b[1;32mfor\u001b[0m \u001b[0mtrain_idx\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mvalidation_idx\u001b[0m \u001b[1;32min\u001b[0m \u001b[0mskfold\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0msplit\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX_train\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my_train\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m:\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0;32m      5\u001b[0m     \u001b[0mprint\u001b[0m\u001b[1;33m(\u001b[0m\u001b[1;34m\"TRAIN:{}\"\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mformat\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0my_train\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0miloc\u001b[0m\u001b[1;33m[\u001b[0m\u001b[0mtrain_idx\u001b[0m\u001b[1;33m]\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mmean\u001b[0m\u001b[1;33m(\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m      6\u001b[0m     \u001b[0mprint\u001b[0m\u001b[1;33m(\u001b[0m\u001b[1;34m\"VALIDATION:{}\"\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mformat\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0my_train\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0miloc\u001b[0m\u001b[1;33m[\u001b[0m\u001b[0mvalidation_idx\u001b[0m\u001b[1;33m]\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mmean\u001b[0m\u001b[1;33m(\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n",
-      "\u001b[1;32m~\\anaconda3\\lib\\site-packages\\sklearn\\model_selection\\_split.py\u001b[0m in \u001b[0;36msplit\u001b[1;34m(self, X, y, groups)\u001b[0m\n\u001b[0;32m    330\u001b[0m                 .format(self.n_splits, n_samples))\n\u001b[0;32m    331\u001b[0m \u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m--> 332\u001b[1;33m         \u001b[1;32mfor\u001b[0m \u001b[0mtrain\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mtest\u001b[0m \u001b[1;32min\u001b[0m \u001b[0msuper\u001b[0m\u001b[1;33m(\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0msplit\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mgroups\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m:\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0;32m    333\u001b[0m             \u001b[1;32myield\u001b[0m \u001b[0mtrain\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mtest\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m    334\u001b[0m \u001b[1;33m\u001b[0m\u001b[0m\n",
-      "\u001b[1;32m~\\anaconda3\\lib\\site-packages\\sklearn\\model_selection\\_split.py\u001b[0m in \u001b[0;36msplit\u001b[1;34m(self, X, y, groups)\u001b[0m\n\u001b[0;32m     78\u001b[0m         \u001b[0mX\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mgroups\u001b[0m \u001b[1;33m=\u001b[0m \u001b[0mindexable\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mgroups\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m     79\u001b[0m         \u001b[0mindices\u001b[0m \u001b[1;33m=\u001b[0m \u001b[0mnp\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0marange\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0m_num_samples\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m---> 80\u001b[1;33m         \u001b[1;32mfor\u001b[0m \u001b[0mtest_index\u001b[0m \u001b[1;32min\u001b[0m \u001b[0mself\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0m_iter_test_masks\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mgroups\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m:\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0;32m     81\u001b[0m             \u001b[0mtrain_index\u001b[0m \u001b[1;33m=\u001b[0m \u001b[0mindices\u001b[0m\u001b[1;33m[\u001b[0m\u001b[0mnp\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mlogical_not\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mtest_index\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m]\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m     82\u001b[0m             \u001b[0mtest_index\u001b[0m \u001b[1;33m=\u001b[0m \u001b[0mindices\u001b[0m\u001b[1;33m[\u001b[0m\u001b[0mtest_index\u001b[0m\u001b[1;33m]\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n",
-      "\u001b[1;32m~\\anaconda3\\lib\\site-packages\\sklearn\\model_selection\\_split.py\u001b[0m in \u001b[0;36m_iter_test_masks\u001b[1;34m(self, X, y, groups)\u001b[0m\n\u001b[0;32m    691\u001b[0m \u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m    692\u001b[0m     \u001b[1;32mdef\u001b[0m \u001b[0m_iter_test_masks\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mself\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mX\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my\u001b[0m\u001b[1;33m=\u001b[0m\u001b[1;32mNone\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mgroups\u001b[0m\u001b[1;33m=\u001b[0m\u001b[1;32mNone\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m:\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m--> 693\u001b[1;33m         \u001b[0mtest_folds\u001b[0m \u001b[1;33m=\u001b[0m \u001b[0mself\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0m_make_test_folds\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0;32m    694\u001b[0m         \u001b[1;32mfor\u001b[0m \u001b[0mi\u001b[0m \u001b[1;32min\u001b[0m \u001b[0mrange\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mself\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mn_splits\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m:\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m    695\u001b[0m             \u001b[1;32myield\u001b[0m \u001b[0mtest_folds\u001b[0m \u001b[1;33m==\u001b[0m \u001b[0mi\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n",
-      "\u001b[1;32m~\\anaconda3\\lib\\site-packages\\sklearn\\model_selection\\_split.py\u001b[0m in \u001b[0;36m_make_test_folds\u001b[1;34m(self, X, y)\u001b[0m\n\u001b[0;32m    643\u001b[0m         \u001b[0mallowed_target_types\u001b[0m \u001b[1;33m=\u001b[0m \u001b[1;33m(\u001b[0m\u001b[1;34m'binary'\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;34m'multiclass'\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m    644\u001b[0m         \u001b[1;32mif\u001b[0m \u001b[0mtype_of_target_y\u001b[0m \u001b[1;32mnot\u001b[0m \u001b[1;32min\u001b[0m \u001b[0mallowed_target_types\u001b[0m\u001b[1;33m:\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m--> 645\u001b[1;33m             raise ValueError(\n\u001b[0m\u001b[0;32m    646\u001b[0m                 'Supported target types are: {}. Got {!r} instead.'.format(\n\u001b[0;32m    647\u001b[0m                     allowed_target_types, type_of_target_y))\n",
-      "\u001b[1;31mValueError\u001b[0m: Supported target types are: ('binary', 'multiclass'). Got 'continuous' instead."
-     ]
-    }
-   ],
-   "source": [
-    "# split training data into 5 parts for cross-validation\n",
-    "kfold = KFold(n_splits=, shuffle=True, random_state=0)\n",
-    "kfold.get_n_splits(X_train, y_train) # see that split worked\n",
-    "for train_idx, validation_idx in skfold.split(X_train, y_train):\n",
-    "    print(\"TRAIN:{}\".format(y_train.iloc[train_idx].mean()))\n",
-    "    print(\"VALIDATION:{}\".format(y_train.iloc[validation_idx].mean()))\n",
-    "    print('\\n')"
+    "#### Regularization / Penalization"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "831206db-b369-4e6b-9785-b6d4a23b020e",
+   "id": "328d0b26-232b-405d-a7c3-ecf1dde1388c",
    "metadata": {},
    "source": [
-    "#### Cross Validation"
+    "# Modeling II"
    ]
   },
   {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "5b1fbe4a-b7e6-4935-be41-97876b3fb7da",
+   "cell_type": "markdown",
+   "id": "632ed294-72f3-4992-a789-0c613d6d6302",
    "metadata": {},
-   "outputs": [],
-   "source": []
+   "source": [
+    "## Multiple Linear Regression II"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "bc0c36c5-006d-430e-b311-0a9cf53e2d45",
+   "metadata": {},
+   "source": [
+    "## GridSearch"
+   ]
   },
   {
    "cell_type": "markdown",
    "id": "e423852a-8495-4ff4-803d-17d985c50ac3",
    "metadata": {},
    "source": [
-    "### Catbooster"
+    "### CatBooster Regression"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 180,
    "id": "8b57ceb6-107b-4114-b49b-3adc77fe238e",
    "metadata": {},
-   "outputs": [],
-   "source": []
+   "outputs": [
+    {
+     "ename": "NameError",
+     "evalue": "name 'CatBoost' is not defined",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mNameError\u001b[0m                                 Traceback (most recent call last)",
+      "\u001b[1;32m<ipython-input-180-935534e3ed93>\u001b[0m in \u001b[0;36m<module>\u001b[1;34m\u001b[0m\n\u001b[0;32m      1\u001b[0m \u001b[1;32mfrom\u001b[0m \u001b[0mcatboost\u001b[0m \u001b[1;32mimport\u001b[0m \u001b[0mCatBoostRegressor\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m      2\u001b[0m \u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m----> 3\u001b[1;33m \u001b[0mcb\u001b[0m \u001b[1;33m=\u001b[0m \u001b[0mCatBoost\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0m",
+      "\u001b[1;31mNameError\u001b[0m: name 'CatBoost' is not defined"
+     ]
+    }
+   ],
+   "source": [
+    "from catboost import CatBoostRegressor\n",
+    "\n",
+    "cb = CatBoostRegressor(verbose=0)"
+   ]
   },
   {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "698aa47f-6ee1-40f1-831b-7bcfa3d9239b",
+   "cell_type": "markdown",
+   "id": "acef8d32-00b4-4731-8bb3-7f35a2f9d69c",
    "metadata": {},
-   "outputs": [],
-   "source": []
+   "source": [
+    "### Tree-Based for continuous?"
+   ]
   },
   {
    "cell_type": "code",
