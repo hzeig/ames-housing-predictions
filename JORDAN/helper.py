@@ -12,3 +12,11 @@ def fill_house_nan(col = None, val = None, col_lst = None, val_lst = None):
         for new_col, new_val in zip(col_lst, val_lst):
             housing[new_col] = housing[new_col].fillna(new_val)
 
+def pickle_it(model, filename):
+    ''' 
+    Takes in a model and a file name and saves a pickel file of the model.
+    Meant to clean the code a bit
+    '''
+    import pickle
+    with open(filename, 'wb') as file:
+        pickle.dump(model, file)
