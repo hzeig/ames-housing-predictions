@@ -7813,20 +7813,20 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 113,
+   "execution_count": 186,
    "id": "2000295a-87a2-4f01-bb49-01ae458d44a4",
    "metadata": {},
    "outputs": [],
    "source": [
     "import math \n",
     "# normalize for these calculations \n",
-    "housePrice_cyc = housePrice\n",
-    "housePrice_cyc[\"MoSold_norm\"] = 2 * math.pi * housePrice[\"MoSold\"]  / housePrice[\"MoSold\"].max()\n",
+    "housePriceCyc = housePrice\n",
+    "housePriceCyc[\"MoSold_norm\"] = 2 * math.pi * housePrice[\"MoSold\"]  / housePrice[\"MoSold\"].max()\n",
     "# assign both sine and cosine values to make sure each value has a unique \n",
     "# and still cyclical value (march and october aren't percieved as the same item)\n",
-    "housePrice_cyc[\"cos_MoSold\"] = np.cos( housePrice_cyc[\"MoSold_norm\"])\n",
-    "housePrice_cyc[\"sin_MoSold\"] = np.sin( housePrice_cyc[\"MoSold_norm\"])\n",
-    "housePrice_cyc = housePrice_cyc.drop(columns=['MoSold_norm','MoSold'])\n",
+    "housePriceCyc[\"cos_MoSold\"] = np.cos( housePriceCyc[\"MoSold_norm\"])\n",
+    "housePriceCyc[\"sin_MoSold\"] = np.sin( housePriceCyc[\"MoSold_norm\"])\n",
+    "housePriceCyc = housePriceCyc.drop(columns=['MoSold_norm','MoSold'])\n",
     "# housePrice[\"sincos_MoSold\"] = np.sin( housePrice[\"cos_MoSold\"])\n",
     "# housePrice.MoSold = np.cos(0.5*housePrice.MoSold)"
    ]
@@ -8236,13 +8236,13 @@
    "source": [
     "standard = StandardScaler()\n",
     "standard.fit(housePrice)\n",
-    "housePrice = pd.DataFrame(standard.transform(housePrice), index = housePrice.index, columns = housePrice.columns)\n",
-    "housePrice"
+    "housePriceStan = pd.DataFrame(standard.transform(housePrice), index = housePrice.index, columns = housePrice.columns)\n",
+    "housePriceStan"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 115,
+   "execution_count": 187,
    "id": "c2736051-300a-43dd-8836-300ff47099a7",
    "metadata": {},
    "outputs": [],
@@ -8250,7 +8250,7 @@
     "# with cycle\n",
     "standard = StandardScaler()\n",
     "standard.fit(housePrice_cyc)\n",
-    "housePrice_cyc = pd.DataFrame(standard.transform(housePrice_cyc), index = housePrice_cyc.index, columns = housePrice_cyc.columns)"
+    "housePriceCycStan = pd.DataFrame(standard.transform(housePrice_cyc), index = housePrice_cyc.index, columns = housePrice_cyc.columns)"
    ]
   },
   {
@@ -8278,15 +8278,15 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 117,
+   "execution_count": 189,
    "id": "bfcd5b45-75df-4fcc-a31f-9d993772a116",
    "metadata": {
     "tags": []
    },
    "outputs": [],
    "source": [
-    "target_cyc = housePrice_cyc['SalePrice'] \n",
-    "features_cyc = housePrice_cyc.drop(columns='SalePrice')"
+    "targetCyc = housePriceCyc['SalePrice'] \n",
+    "featuresCyc = housePriceCyc.drop(columns='SalePrice')"
    ]
   },
   {
@@ -8720,7 +8720,8 @@
     "\n",
     "lm = LinearRegression()\n",
     "\n",
-    "rfe = RFE(lm, 5, step=1)"
+    "rfe = RFE(lm, 5, step=1)\n",
+    "\n"
    ]
   },
   {
@@ -8745,6 +8746,178 @@
    "metadata": {},
    "source": [
     "## Multiple Linear Regression II"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 183,
+   "id": "cbf3b660-9ae0-47c4-a675-241f5681bc0e",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "LinearRegression()"
+      ]
+     },
+     "execution_count": 183,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "ols = LinearRegression() \n",
+    "ols.fit(X_train, y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 121,
+   "id": "2155c384-9da6-4b4c-88d1-232f7c650e93",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "R^2 0.9383912601597127\n",
+      "RSS 158.95054878794113\n",
+      "beta0:0.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "# first glance \n",
+    "print('R^2', ols.score(features, target))\n",
+    "print('RSS', np.sum((ols.predict(features) - target) ** 2))\n",
+    "print('beta0:' + str(np.round(ols.intercept_, 2)))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 122,
+   "id": "533fa6e0-b7a7-441a-8a27-aa2434ed35bf",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "R^2 0.9383479549226876\n",
+      "RSS 159.06227629946605\n",
+      "beta0:0.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "# cyc performed ever so slightly (0.000001) worse than non cycle capturing\n",
+    "print('R^2', ols2.score(features_cyc, target_cyc))\n",
+    "print('RSS', np.sum((ols2.predict(features_cyc) - target_cyc) ** 2))\n",
+    "print('beta0:' + str(np.round(ols2.intercept_, 2)))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d26b80f1-ee52-4a52-b1e2-01f624a1fe9e",
+   "metadata": {},
+   "source": [
+    "#### Train Test Split"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 125,
+   "id": "5a9e3919-f746-4854-bf5a-90c25f1572d7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "X_train, X_test, y_train, y_test = train_test_split(\n",
+    "    features, target, test_size=0.5, random_state=0)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 162,
+   "id": "7907b8ec-8a73-4f20-80e5-795f2a19a6e4",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "R^2 train 0.9481267645891195\n",
+      "R^2 test -5.176200370275267e+22\n"
+     ]
+    }
+   ],
+   "source": [
+    "ols = LinearRegression()\n",
+    "ols.fit(X_train, y_train)\n",
+    "print('R^2 train', ols.score(X_train, y_train))\n",
+    "print('R^2 test', ols.score(X_test, y_test))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5167428e-8d74-483a-8cdb-b18deb827eaa",
+   "metadata": {},
+   "source": [
+    "#### K-fold Split and Cross Validation"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 178,
+   "id": "1ce3487a-a25f-4a74-9dae-282984b74e12",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "5"
+      ]
+     },
+     "execution_count": 178,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# split training data into 5 parts for cross-validation\n",
+    "kfold = KFold(n_splits=5, shuffle=True, random_state=0)\n",
+    "kfold.get_n_splits(X_train, y_train) # see that split worked"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 179,
+   "id": "82c929bd-1623-4126-b2dc-dd9593088630",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[-1.78475557e+23 -2.89923605e+18 -1.47945895e+21 -4.47879758e+22\n",
+      " -3.37864430e+19]\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "-4.495593543735972e+22"
+      ]
+     },
+     "execution_count": 179,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "lm = LinearRegression()\n",
+    "scores = cross_val_score(lm, X_train, y_train, cv=kfold)\n",
+    "print(scores)\n",
+    "np.mean(scores)"
    ]
   },
   {
@@ -8789,120 +8962,174 @@
   },
   {
    "cell_type": "markdown",
+   "id": "4f444128-02bb-4fd0-8390-9fd8b2b278b7",
+   "metadata": {},
+   "source": [
+    "## Time Series"
+   ]
+  },
+  {
+   "cell_type": "markdown",
    "id": "acef8d32-00b4-4731-8bb3-7f35a2f9d69c",
    "metadata": {},
    "source": [
-    "### Tree-Based for continuous?"
+    "## Tree-Based for continuous?"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "a8ad2d2b-dffd-4f1e-b17f-d46b4e276db1",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "d57a7484-c836-4bfa-81b6-b079c7ea9d37",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "68d7337b-078d-4ea5-8a41-7aa67843d23f",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "1919be53-4a71-452b-93e2-e010287864af",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "1b4a4e1a-de50-4e4f-b087-8f3fb8e173e7",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "9ff5392b-8542-47c2-8af7-898feb0bbb97",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "82362088-b51f-4e3b-8ed0-72bcb9c85ee0",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "ff05af7f-a9bc-4343-ac3d-13694b8d4996",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "f2111a99-2695-4fdd-b4a5-261286ff59e9",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "94e41ba0-9b11-43cd-9047-bf3ad4e324ae",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "44f79a50-afda-4931-be06-a4f7bf270535",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "1ce9ac48-a4ef-45ec-b480-6c295d53f32a",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "f25843e9-f9b9-4ec9-8cc9-6a4853bd1c5d",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
    "id": "e856aa0e-21f7-40c5-96fd-705b417910ae",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b6c593b0-ef95-4cfc-95e6-eb3ce3c07774",
+   "metadata": {},
+   "source": [
+    "## Tracking Models and Datasets \n",
+    "- dataset variations\n",
+    "- train/test split code\n",
+    "- models (untrained)\n",
+    "- models (trained, pickle)\n",
+    "- ensembles (untrained)\n",
+    "- ensembles (trained, pickle)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6c588b73-3187-4a3e-aa4a-9028aee50f75",
+   "metadata": {},
+   "source": [
+    "#### Datasets"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 192,
+   "id": "0cba013a-5c47-4a1d-8599-174d630175af",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "NameError",
+     "evalue": "name 'housePriceStan' is not defined",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mNameError\u001b[0m                                 Traceback (most recent call last)",
+      "\u001b[1;32m<ipython-input-192-c75cde1034c3>\u001b[0m in \u001b[0;36m<module>\u001b[1;34m\u001b[0m\n\u001b[1;32m----> 1\u001b[1;33m data_dict : {'encoded': housePrice, 'cyclical' : housePriceCyc, 'standardScaler' : housePriceStan, \n\u001b[0m\u001b[0;32m      2\u001b[0m              \u001b[1;34m'VIF'\u001b[0m \u001b[1;33m:\u001b[0m \u001b[0mhousePriceVIF\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;34m'RFE'\u001b[0m \u001b[1;33m:\u001b[0m \u001b[0mhousePriceRFE\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;34m'StanVIF'\u001b[0m \u001b[1;33m:\u001b[0m \u001b[0mhousePriceStanVif\u001b[0m\u001b[1;33m,\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m      3\u001b[0m             \u001b[1;34m'StanRFE'\u001b[0m \u001b[1;33m:\u001b[0m \u001b[0mhousePriceStanRfe\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;34m'CycVIF'\u001b[0m \u001b[1;33m:\u001b[0m \u001b[0mhousePriceCycVif\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;34m'CycRFE'\u001b[0m \u001b[1;33m:\u001b[0m \u001b[0mhousePriceCycRfe\u001b[0m\u001b[1;33m,\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m      4\u001b[0m              'CycStanVIF' : housePriceCycStanVif, 'CycStanRFE' : housePriceCycStanRfe}\n\u001b[0;32m      5\u001b[0m \u001b[1;33m\u001b[0m\u001b[0m\n",
+      "\u001b[1;31mNameError\u001b[0m: name 'housePriceStan' is not defined"
+     ]
+    }
+   ],
+   "source": [
+    "data_dict : {'encoded': housePrice, 'cyclical' : housePriceCyc, 'standardScaler' : housePriceStan, \n",
+    "             'VIF' : housePriceVIF, 'RFE' : housePriceRFE, 'StanVIF' : housePriceStanVif,\n",
+    "            'StanRFE' : housePriceStanRfe, 'CycVIF' : housePriceCycVif, 'CycRFE' : housePriceCycRfe, \n",
+    "             'CycStanVIF' : housePriceCycStanVif, 'CycStanRFE' : housePriceCycStanRfe}\n",
+    "\n",
+    "# housePrice\n",
+    "# housePriceCyc\n",
+    "# housePriceStan\n",
+    "# housePriceVif\n",
+    "# housePriceRfe\n",
+    "# housePriceStanVif\n",
+    "# housePriceStanRfe\n",
+    "# housePriceCycVif\n",
+    "# housePriceCycRfe\n",
+    "# housePriceCycStanVif\n",
+    "# housePriceCycStanRfe"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "dcf72f82-bbb9-48b9-be72-21a8ed813c05",
+   "metadata": {},
+   "source": [
+    "#### Train/Test Split"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d890b743-37ea-4377-8767-1d2a22ca1a6c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# simple\n",
+    "X_train, X_test, y_train, y_test = train_test_split(\n",
+    "    features, target, test_size=0.5, random_state=0)\n",
+    "# k-fold\n",
+    "kfold = KFold(n_splits=5, shuffle=True, random_state=0)\n",
+    "# cross-validation\n",
+    "lm = LinearRegression()\n",
+    "scores = cross_val_score(lm, X_train, y_train, cv=kfold)\n",
+    "print(scores)\n",
+    "np.mean(scores)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "720becfa-aef4-486d-9c7e-d89e32373917",
+   "metadata": {},
+   "source": [
+    "#### Models (untrained)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "27ab1eeb-5ffd-4984-8748-ff4e7eb8a971",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "id": "956fa2b4-d5eb-4a52-b5b8-a5ef20ea015a",
+   "metadata": {},
+   "source": [
+    "#### Models (trained, picked)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "92dd3e6b-e54b-4718-8aa8-f8819935681b",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "id": "92122122-1429-44a5-9b5b-8f15069f0b63",
+   "metadata": {},
+   "source": [
+    "#### Ensembles (untrained)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "60fb2424-01c1-4d97-91dc-3d9cebe77002",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3c76496b-8de8-47fa-b8c1-7a2ce1521889",
+   "metadata": {},
+   "source": [
+    "#### Ensembles (trained, pickled)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "20def878-9790-4421-94c4-07080ff8fb67",
    "metadata": {},
    "outputs": [],
    "source": []
