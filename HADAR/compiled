@@ -8436,17 +8436,25 @@
   {
    "cell_type": "code",
    "execution_count": 124,
-   "id": "5ba40164-596d-4610-ac38-74edab4bc157",
+   "id": "2a4acc9a-86c7-42e1-8449-a085bfe88f98",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from patsy import dmatrices\n",
+    "from statsmodels.stats.outliers_influence import variance_inflation_factor\n",
+    "\n",
+    "## alternative multipler regression method\n",
+    "vif = pd.DataFrame()\n",
+    "vif['VIF'] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]\n",
+    "vif['variable'] = X.columns"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 150,
+   "id": "3f80429b-19a4-49f3-807a-e0d2d6670c36",
    "metadata": {},
    "outputs": [
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "C:\\Users\\hzeig\\anaconda3\\lib\\site-packages\\statsmodels\\stats\\outliers_influence.py:193: RuntimeWarning: divide by zero encountered in double_scalars\n",
-      "  vif = 1. / (1. - r_squared_i)\n"
-     ]
-    },
     {
      "data": {
       "text/html": [
@@ -8474,44 +8482,14 @@
        "  </thead>\n",
        "  <tbody>\n",
        "    <tr>\n",
-       "      <th>0</th>\n",
-       "      <td>36.859182</td>\n",
-       "      <td>GrLivArea</td>\n",
+       "      <th>145</th>\n",
+       "      <td>inf</td>\n",
+       "      <td>Exterior1st_PreCast</td>\n",
        "    </tr>\n",
        "    <tr>\n",
-       "      <th>1</th>\n",
-       "      <td>16.362128</td>\n",
-       "      <td>MSSubClass</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>2</th>\n",
-       "      <td>4.776893</td>\n",
-       "      <td>LotArea</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>3</th>\n",
-       "      <td>4.532191</td>\n",
-       "      <td>OverallQual</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>4</th>\n",
-       "      <td>2.016409</td>\n",
-       "      <td>OverallCond</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>...</th>\n",
-       "      <td>...</td>\n",
-       "      <td>...</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>200</th>\n",
-       "      <td>3.093734</td>\n",
-       "      <td>SaleCondition_Normal</td>\n",
-       "    </tr>\n",
-       "    <tr>\n",
-       "      <th>201</th>\n",
-       "      <td>32.035366</td>\n",
-       "      <td>SaleCondition_Partial</td>\n",
+       "      <th>16</th>\n",
+       "      <td>inf</td>\n",
+       "      <td>BsmtHalfBath</td>\n",
        "    </tr>\n",
        "    <tr>\n",
        "      <th>202</th>\n",
@@ -8519,14 +8497,44 @@
        "      <td>MoSold_norm</td>\n",
        "    </tr>\n",
        "    <tr>\n",
-       "      <th>203</th>\n",
-       "      <td>1.237800</td>\n",
-       "      <td>cos_MoSold</td>\n",
+       "      <th>15</th>\n",
+       "      <td>inf</td>\n",
+       "      <td>BsmtFullBath</td>\n",
        "    </tr>\n",
        "    <tr>\n",
-       "      <th>204</th>\n",
-       "      <td>3.393348</td>\n",
-       "      <td>sin_MoSold</td>\n",
+       "      <th>159</th>\n",
+       "      <td>inf</td>\n",
+       "      <td>Exterior2nd_PreCast</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>...</th>\n",
+       "      <td>...</td>\n",
+       "      <td>...</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>34</th>\n",
+       "      <td>1.153202</td>\n",
+       "      <td>YrSold</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>62</th>\n",
+       "      <td>1.137981</td>\n",
+       "      <td>LotShape_IR3</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>29</th>\n",
+       "      <td>1.137325</td>\n",
+       "      <td>3SsnPorch</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>132</th>\n",
+       "      <td>1.113123</td>\n",
+       "      <td>RoofMatl_Roll</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>195</th>\n",
+       "      <td>1.067225</td>\n",
+       "      <td>SaleType_VWD</td>\n",
        "    </tr>\n",
        "  </tbody>\n",
        "</table>\n",
@@ -8534,63 +8542,34 @@
        "</div>"
       ],
       "text/plain": [
-       "           VIF               variable\n",
-       "0    36.859182              GrLivArea\n",
-       "1    16.362128             MSSubClass\n",
-       "2     4.776893                LotArea\n",
-       "3     4.532191            OverallQual\n",
-       "4     2.016409            OverallCond\n",
-       "..         ...                    ...\n",
-       "200   3.093734   SaleCondition_Normal\n",
-       "201  32.035366  SaleCondition_Partial\n",
-       "202        inf            MoSold_norm\n",
-       "203   1.237800             cos_MoSold\n",
-       "204   3.393348             sin_MoSold\n",
+       "          VIF             variable\n",
+       "145       inf  Exterior1st_PreCast\n",
+       "16        inf         BsmtHalfBath\n",
+       "202       inf          MoSold_norm\n",
+       "15        inf         BsmtFullBath\n",
+       "159       inf  Exterior2nd_PreCast\n",
+       "..        ...                  ...\n",
+       "34   1.153202               YrSold\n",
+       "62   1.137981         LotShape_IR3\n",
+       "29   1.137325            3SsnPorch\n",
+       "132  1.113123        RoofMatl_Roll\n",
+       "195  1.067225         SaleType_VWD\n",
        "\n",
        "[205 rows x 2 columns]"
       ]
      },
-     "execution_count": 124,
+     "execution_count": 150,
      "metadata": {},
      "output_type": "execute_result"
     }
    ],
    "source": [
-    "from patsy import dmatrices\n",
-    "from statsmodels.stats.outliers_influence import variance_inflation_factor\n",
-    "\n",
-    "## alternative multipler regression method\n",
-    "vif = pd.DataFrame()\n",
-    "vif['VIF'] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]\n",
-    "vif['variable'] = X.columns\n",
-    "\n",
-    "vif"
+    "vif.sort_values('VIF',ascending=False)"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 135,
-   "id": "4e5e8055-b662-4b99-a1c0-fc80d97548a7",
-   "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "86"
-      ]
-     },
-     "execution_count": 135,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
-   "source": [
-    "vif['variable'].loc[vif['VIF'] > 5].count()"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 137,
+   "execution_count": null,
    "id": "e5a9d09e-11fb-4364-aa9f-98d43b72c779",
    "metadata": {},
    "outputs": [],
@@ -8600,47 +8579,42 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
-   "id": "c6810a55-b24e-4a02-8151-c073c2dc212a",
+   "execution_count": 155,
+   "id": "4e5e8055-b662-4b99-a1c0-fc80d97548a7",
    "metadata": {},
    "outputs": [
     {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Iteration no  1\n",
-      "[36.859182303845415, 16.362128107551932, 4.776892750642475, 4.532191451326169, 2.0164089995147734, 11.965945193866204, 2.974503423085885, 28.673462061276073, 6.371109172175179, 5.7962847439866065, 2.864547457793455, 5.3364040986588845, 26.079123037410408, 41.94999433363771, 1.9099874220798343, inf, inf, 3.4752063787831995, 2.8184111351285783, 3.2106670069620793, 4.1308476706723365, 5.181049987925779, 3.5706792881331952, 79.25894257192225, 7.298854607549958, 6.568370970629839, 1.4330644865094124, 1.6939813126265484, 1.5461224620925582, 1.1373250904281131, 1.1893540817552362, 4.4281268797051565, 1.153646803237042, inf, 1.153201870915778, 1.9961837109819418, 3.459051290722141, 1.3261484558733123, 3.736036809162658, 1.2561811798723437, 2.258889838599925, 6.032919113502819, 5.616484139544901, 1.8142180461631816, 2.6202587163487414, 1.3973174748285628, 3.105824189878816, 2.792237929267289, 1.8637149457329687, 1.9395937080074916, 1.9124922206535475, 4.462210482927832, 51.24347832340477, 318.886384191998, 7.347788356083698, 63.154096328720605, 1294.8510347458741, 1034.2959909137433, 1.4151031752912342, 2.3363639073050497, 2.482307328870315, 1.26256204840004, 1.1379812146270614, 1.6083649955956383, 2.490796804008082, 2.212818525908526, 3.2038717687333853, 1.5066381512104317, 1.6070828977218592, 1.3551563698916658, 1.1563509093726598, 1.6526074799457242, 1.8820943613993482, 4.061425337381569, 9.81242300142347, 4.132255698933627, 14.710460536838175, 7.821055517722938, 12.035585571499157, 10.168424411984137, 1.6948112597873164, 1.233297955599508, 8.665912939015511, 1.1620586835468225, 4.800261747828833, 7.988252605917311, 26.1208385914488, 6.007416223775815, 9.352267548659276, 5.641673179680213, 8.524412760542358, 19.850979115285842, 4.401436165286056, 10.54907044439977, 8.047760375898962, 14.009141158096854, 3.6621282333790854, 4.468802365333185, 2.7013992233400783, 3.099638074912238, 4.823177985607593, 1.4843097925200883, 1.758317424524887, 1.5873307792489122, 1.975537817105007, 1.1672984966365736, 1.3035559456208485, 5.772140258796583, 9.653645831351337, 2.316548365861997, 2.31617070573656, 1.9201116361489952, 1.4347644841417788, 1.823489944399242, 2.869217397052393, 4.927176455128016, 5.388840397939854, 8.555064933735064, 1.7826588677597788, 27.075085056846202, 1.4005391002136098, 1.4369239703620171, 5.8061968915621245, 3.7842000206022193, 3.9192761229013993, 102.88379080120006, 5.588047814285304, 96.81272690717225, 3.8032265645685626, 2.5652616715280905, 1.314908826266732, 1.360621009072686, 1.1131227337927727, 3.2484769061246457, 1.3259976257173438, 1.196145400488275, 2.531245477840107, 2.2822881086119535, 12.534529942412036, 3.735610188164437, 33.54110897447979, 53.89458625824722, 1.2580516672627724, 65.14751255652051, 27.247120384205108, inf, 6.805530402100793, 103.18138617426833, 47.222521722032134, 8.42058507302775, 2.9594155961182462, 8.110895083641086, 8.641398372505323, 2.4089757238806273, 34.75853622176802, 53.54381670400945, 3.1399346619218838, 68.58896588159077, 33.66295336245873, inf, 2.0219694013695744, 7.279128217809699, 108.29808090917724, 48.96038775323838, 12.494968067792325, 31.331299830921644, 57.9929470032512, 10.686070102291568, 5.863107846110841, 7.020562664448861, 3.4499423800530042, 1.1815484821147022, 1.156853825974982, 43.85648357444966, 28.73035944984147, 8.98671473955417, 3.3506976145560916, 7.159821561418756, 2.0808960388850934, 1.474105550478879, 1.2409272877918556, 1.6676313664413243, 37.060616019845455, 2.762301347010102, 10.018156487844642, 1.6626070776418476, 30.595157740630007, 85.30692724163677, 1.3051932931899717, 1.2385420930020332, 1.6871152949785138, 1.2122836063848166, 1.2876770448098007, 32.25300137505196, 1.15530899896087, 1.0672246923576496, 4.061229555318433, 1.410142165939042, 1.365244406607617, 1.4113865510672574, 3.0937342089104787, 32.03536580917198, inf, 1.2378000135255, 3.3933478587168087]\n",
-      "Max vif for variable: 15\n",
-      "Iteration no  2\n",
-      "[36.859182303845415, 16.362128107551932, 4.776892750642478, 4.532191451326169, 2.0164089995147734, 11.965945193866204, 2.9745034230858836, 28.673462061276073, 6.371109172175179, 5.79628474398661, 2.864547457793455, 5.3364040986588845, 26.079123037410408, 41.94999433363771, 1.9099874220798347, 1.161313738905339, 3.4752063787831995, 2.8184111351285783, 3.21066700696208, 4.130847670672338, 5.181049987925779, 3.5706792881331952, 79.25894257192225, 7.298854607549958, 6.568370970629839, 1.4330644865094126, 1.6939813126265484, 1.5461224620925582, 1.137325090428113, 1.189354081755236, 4.4281268797051565, 1.153646803237042, inf, 1.1532018709157785, 1.9961837109819414, 3.459051290722141, 1.326148455873312, 3.7360368091626563, 1.2561811798723435, 2.2588898385999254, 6.032919113502819, 5.616484139544901, 1.8142180461631816, 2.6202587163487414, 1.3973174748285628, 3.105824189878815, 2.792237929267289, 1.8637149457329687, 1.9395937080074916, 1.9124922206535475, 4.462210482927832, 51.24347832340477, 318.886384191998, 7.347788356083698, 63.154096328720605, 1294.8510347458741, 1034.2959909137433, 1.4151031752912342, 2.3363639073050497, 2.4823073288703146, 1.2625620484000402, 1.1379812146270614, 1.6083649955956387, 2.490796804008082, 2.212818525908526, 3.2038717687333853, 1.506638151210431, 1.6070828977218587, 1.355156369891666, 1.15635090937266, 1.6526074799457242, 1.8820943613993477, 4.061425337381569, 9.81242300142347, 4.132255698933623, 14.710460536838175, 7.821055517722938, 12.035585571499157, 10.16842441198415, 1.6948112597873166, 1.2332979555995078, 8.665912939015511, 1.1620586835468227, 4.800261747828833, 7.988252605917304, 26.1208385914488, 6.007416223775815, 9.352267548659276, 5.641673179680213, 8.524412760542349, 19.850979115285842, 4.401436165286052, 10.549070444399758, 8.047760375898962, 14.009141158096854, 3.6621282333790854, 4.468802365333187, 2.701399223340079, 3.099638074912237, 4.8231779856075905, 1.4843097925200883, 1.7583174245248865, 1.5873307792489117, 1.9755378171050075, 1.1672984966365736, 1.3035559456208485, 5.772140258796586, 9.653645831351337, 2.316548365861997, 2.3161707057365586, 1.9201116361489963, 1.4347644841417788, 1.823489944399242, 2.869217397052395, 4.927176455128016, 5.38884039793985, 8.555064933735057, 1.7826588677597788, 27.075085056846202, 1.4005391002136094, 1.4369239703620171, 5.8061968915621245, 3.7842000206022175, 3.9192761229013993, 102.88379080120006, 5.588047814285304, 96.81272690717225, 3.8032265645685626, 2.565261671528089, 1.314908826266732, 1.3606210090726856, 1.1131227337927727, 3.2484769061246457, 1.3259976257173438, 1.1961454004882752, 2.531245477840107, 2.2822881086119544, 12.534529942412036, 3.735610188164437, 33.54110897447979, 53.89458625824722, 1.2580516672627728, 65.14751255652051, 27.247120384205108, inf, 6.805530402100793, 103.18138617426715, 47.222521722032134, 8.42058507302775, 2.959415596118247, 8.110895083641086, 8.641398372505332, 2.408975723880627, 34.75853622176802, 53.54381670400945, 3.1399346619218838, 68.58896588159077, 33.66295336245873, inf, 2.0219694013695744, 7.279128217809699, 108.29808090917724, 48.96038775323838, 12.494968067792325, 31.331299830921644, 57.9929470032512, 10.686070102291568, 5.863107846110841, 7.020562664448861, 3.4499423800530042, 1.1815484821147022, 1.1568538259749819, 43.85648357444966, 28.73035944984147, 8.98671473955417, 3.350697614556093, 7.159821561418761, 2.0808960388850934, 1.474105550478879, 1.2409272877918556, 1.6676313664413247, 37.060616019845455, 2.762301347010102, 10.018156487844653, 1.6626070776418478, 30.595157740630007, 85.30692724163677, 1.3051932931899717, 1.2385420930020332, 1.6871152949785138, 1.2122836063848166, 1.2876770448098007, 32.25300137505196, 1.1553089989608702, 1.0672246923576503, 4.061229555318433, 1.4101421659390427, 1.3652444066076175, 1.4113865510672579, 3.0937342089104787, 32.03536580917198, inf, 1.2378000135255005, 3.39334785871681]\n",
-      "Max vif for variable: 32\n"
-     ]
+     "data": {
+      "text/plain": [
+       "(2580, 119)"
+      ]
+     },
+     "execution_count": 155,
+     "metadata": {},
+     "output_type": "execute_result"
     }
    ],
    "source": [
-    "def cal_vif(x):\n",
-    "    thresh = 5\n",
-    "    output = pd.DataFrame()\n",
-    "    k = x.shape[1]\n",
-    "    vif = [variance_inflation_factor(x.values, i) for i in range(x.shape[1])]\n",
-    "    for i in range(1, k):\n",
-    "        print('Iteration no ',i)\n",
-    "        print(vif)\n",
-    "        a = np.argmax(vif)\n",
-    "        print('Max vif for variable:', a)\n",
-    "        if(vif[a]<=thresh):\n",
-    "            break\n",
-    "        if(i==1):\n",
-    "            output = x.drop(x.columns[a], axis=1)\n",
-    "            vif = [variance_inflation_factor(output.values,j) for j in range(output.shape[1])]\n",
-    "        elif(i>1):\n",
-    "            output = output.drop(output.columns[a], axis=1)\n",
-    "            vif = [variance_inflation_factor(output.values,j) for j in range(output.shape[1])]\n",
-    "    return(output)\n",
-    "\n",
-    "selected_features = cal_vif(X)\n",
-    "selected_features"
+    "fiveplus_vif = vif['variable'].loc[vif['VIF'] > 5]\n",
+    "Xvif = X.loc[:,~X.columns.isin(fiveplus_vif)]\n",
+    "Xvif.shape"
    ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "636eb29e-3558-4781-b84f-847081656a6b",
+   "metadata": {},
+   "source": [
+    "#### Wrapper Method"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "185c9149-343e-4187-a8d2-a292645c5e32",
+   "metadata": {},
+   "outputs": [],
+   "source": []
   },
   {
    "cell_type": "markdown",
@@ -8663,7 +8637,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 126,
+   "execution_count": 162,
    "id": "427d5654-de57-409e-a75e-85cc56418e95",
    "metadata": {},
    "outputs": [
@@ -8671,16 +8645,16 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "Rsq train 0.9481267645891195\n",
-      "Rsq test -5.176200370275267e+22\n"
+      "R^2 train 0.9481267645891195\n",
+      "R^2 test -5.176200370275267e+22\n"
      ]
     }
    ],
    "source": [
     "ols = LinearRegression()\n",
     "ols.fit(X_train, y_train)\n",
-    "print('Rsq train', ols.score(X_train, y_train))\n",
-    "print('Rsq test', ols.score(X_test, y_test))"
+    "print('R^2 train', ols.score(X_train, y_train))\n",
+    "print('R^2 test', ols.score(X_test, y_test))"
    ]
   },
   {
@@ -8688,37 +8662,64 @@
    "id": "521b442c-19fb-479e-9c1d-3589a7111c13",
    "metadata": {},
    "source": [
-    "#### Stratified K-fold Split"
+    "#### K-fold Split"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 127,
+   "execution_count": 166,
    "id": "38f26f91-8f2e-4c57-b69c-30eaea1e8b08",
    "metadata": {},
    "outputs": [
     {
-     "ename": "SyntaxError",
-     "evalue": "unexpected EOF while parsing (<ipython-input-127-da62ab0ef4af>, line 3)",
+     "ename": "ValueError",
+     "evalue": "Supported target types are: ('binary', 'multiclass'). Got 'continuous' instead.",
      "output_type": "error",
      "traceback": [
-      "\u001b[1;36m  File \u001b[1;32m\"<ipython-input-127-da62ab0ef4af>\"\u001b[1;36m, line \u001b[1;32m3\u001b[0m\n\u001b[1;33m    \u001b[0m\n\u001b[1;37m    ^\u001b[0m\n\u001b[1;31mSyntaxError\u001b[0m\u001b[1;31m:\u001b[0m unexpected EOF while parsing\n"
+      "\u001b[1;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[1;31mValueError\u001b[0m                                Traceback (most recent call last)",
+      "\u001b[1;32m<ipython-input-166-89100baa122b>\u001b[0m in \u001b[0;36m<module>\u001b[1;34m\u001b[0m\n\u001b[0;32m      2\u001b[0m \u001b[0mskfold\u001b[0m \u001b[1;33m=\u001b[0m \u001b[0mStratifiedKFold\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mn_splits\u001b[0m\u001b[1;33m=\u001b[0m\u001b[1;36m5\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mshuffle\u001b[0m\u001b[1;33m=\u001b[0m\u001b[1;32mTrue\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mrandom_state\u001b[0m\u001b[1;33m=\u001b[0m\u001b[1;36m0\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m      3\u001b[0m \u001b[0mskfold\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mget_n_splits\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX_train\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my_train\u001b[0m\u001b[1;33m)\u001b[0m \u001b[1;31m# see that split worked\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m----> 4\u001b[1;33m \u001b[1;32mfor\u001b[0m \u001b[0mtrain_idx\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mvalidation_idx\u001b[0m \u001b[1;32min\u001b[0m \u001b[0mskfold\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0msplit\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX_train\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my_train\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m:\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0;32m      5\u001b[0m     \u001b[0mprint\u001b[0m\u001b[1;33m(\u001b[0m\u001b[1;34m\"TRAIN:{}\"\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mformat\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0my_train\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0miloc\u001b[0m\u001b[1;33m[\u001b[0m\u001b[0mtrain_idx\u001b[0m\u001b[1;33m]\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mmean\u001b[0m\u001b[1;33m(\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m      6\u001b[0m     \u001b[0mprint\u001b[0m\u001b[1;33m(\u001b[0m\u001b[1;34m\"VALIDATION:{}\"\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mformat\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0my_train\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0miloc\u001b[0m\u001b[1;33m[\u001b[0m\u001b[0mvalidation_idx\u001b[0m\u001b[1;33m]\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mmean\u001b[0m\u001b[1;33m(\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n",
+      "\u001b[1;32m~\\anaconda3\\lib\\site-packages\\sklearn\\model_selection\\_split.py\u001b[0m in \u001b[0;36msplit\u001b[1;34m(self, X, y, groups)\u001b[0m\n\u001b[0;32m    330\u001b[0m                 .format(self.n_splits, n_samples))\n\u001b[0;32m    331\u001b[0m \u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m--> 332\u001b[1;33m         \u001b[1;32mfor\u001b[0m \u001b[0mtrain\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mtest\u001b[0m \u001b[1;32min\u001b[0m \u001b[0msuper\u001b[0m\u001b[1;33m(\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0msplit\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mgroups\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m:\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0;32m    333\u001b[0m             \u001b[1;32myield\u001b[0m \u001b[0mtrain\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mtest\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m    334\u001b[0m \u001b[1;33m\u001b[0m\u001b[0m\n",
+      "\u001b[1;32m~\\anaconda3\\lib\\site-packages\\sklearn\\model_selection\\_split.py\u001b[0m in \u001b[0;36msplit\u001b[1;34m(self, X, y, groups)\u001b[0m\n\u001b[0;32m     78\u001b[0m         \u001b[0mX\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mgroups\u001b[0m \u001b[1;33m=\u001b[0m \u001b[0mindexable\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mgroups\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m     79\u001b[0m         \u001b[0mindices\u001b[0m \u001b[1;33m=\u001b[0m \u001b[0mnp\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0marange\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0m_num_samples\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m---> 80\u001b[1;33m         \u001b[1;32mfor\u001b[0m \u001b[0mtest_index\u001b[0m \u001b[1;32min\u001b[0m \u001b[0mself\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0m_iter_test_masks\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mgroups\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m:\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0;32m     81\u001b[0m             \u001b[0mtrain_index\u001b[0m \u001b[1;33m=\u001b[0m \u001b[0mindices\u001b[0m\u001b[1;33m[\u001b[0m\u001b[0mnp\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mlogical_not\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mtest_index\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m]\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m     82\u001b[0m             \u001b[0mtest_index\u001b[0m \u001b[1;33m=\u001b[0m \u001b[0mindices\u001b[0m\u001b[1;33m[\u001b[0m\u001b[0mtest_index\u001b[0m\u001b[1;33m]\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n",
+      "\u001b[1;32m~\\anaconda3\\lib\\site-packages\\sklearn\\model_selection\\_split.py\u001b[0m in \u001b[0;36m_iter_test_masks\u001b[1;34m(self, X, y, groups)\u001b[0m\n\u001b[0;32m    691\u001b[0m \u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m    692\u001b[0m     \u001b[1;32mdef\u001b[0m \u001b[0m_iter_test_masks\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mself\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mX\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my\u001b[0m\u001b[1;33m=\u001b[0m\u001b[1;32mNone\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0mgroups\u001b[0m\u001b[1;33m=\u001b[0m\u001b[1;32mNone\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m:\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m--> 693\u001b[1;33m         \u001b[0mtest_folds\u001b[0m \u001b[1;33m=\u001b[0m \u001b[0mself\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0m_make_test_folds\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mX\u001b[0m\u001b[1;33m,\u001b[0m \u001b[0my\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0;32m    694\u001b[0m         \u001b[1;32mfor\u001b[0m \u001b[0mi\u001b[0m \u001b[1;32min\u001b[0m \u001b[0mrange\u001b[0m\u001b[1;33m(\u001b[0m\u001b[0mself\u001b[0m\u001b[1;33m.\u001b[0m\u001b[0mn_splits\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m:\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m    695\u001b[0m             \u001b[1;32myield\u001b[0m \u001b[0mtest_folds\u001b[0m \u001b[1;33m==\u001b[0m \u001b[0mi\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n",
+      "\u001b[1;32m~\\anaconda3\\lib\\site-packages\\sklearn\\model_selection\\_split.py\u001b[0m in \u001b[0;36m_make_test_folds\u001b[1;34m(self, X, y)\u001b[0m\n\u001b[0;32m    643\u001b[0m         \u001b[0mallowed_target_types\u001b[0m \u001b[1;33m=\u001b[0m \u001b[1;33m(\u001b[0m\u001b[1;34m'binary'\u001b[0m\u001b[1;33m,\u001b[0m \u001b[1;34m'multiclass'\u001b[0m\u001b[1;33m)\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[0;32m    644\u001b[0m         \u001b[1;32mif\u001b[0m \u001b[0mtype_of_target_y\u001b[0m \u001b[1;32mnot\u001b[0m \u001b[1;32min\u001b[0m \u001b[0mallowed_target_types\u001b[0m\u001b[1;33m:\u001b[0m\u001b[1;33m\u001b[0m\u001b[1;33m\u001b[0m\u001b[0m\n\u001b[1;32m--> 645\u001b[1;33m             raise ValueError(\n\u001b[0m\u001b[0;32m    646\u001b[0m                 'Supported target types are: {}. Got {!r} instead.'.format(\n\u001b[0;32m    647\u001b[0m                     allowed_target_types, type_of_target_y))\n",
+      "\u001b[1;31mValueError\u001b[0m: Supported target types are: ('binary', 'multiclass'). Got 'continuous' instead."
      ]
     }
    ],
    "source": [
-    "skfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)\n",
-    "for training_idx, validation_idx in skfold.split(X_train, y_train):\n",
-    "    "
+    "# split training data into 5 parts for cross-validation\n",
+    "kfold = KFold(n_splits=, shuffle=True, random_state=0)\n",
+    "kfold.get_n_splits(X_train, y_train) # see that split worked\n",
+    "for train_idx, validation_idx in skfold.split(X_train, y_train):\n",
+    "    print(\"TRAIN:{}\".format(y_train.iloc[train_idx].mean()))\n",
+    "    print(\"VALIDATION:{}\".format(y_train.iloc[validation_idx].mean()))\n",
+    "    print('\\n')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "831206db-b369-4e6b-9785-b6d4a23b020e",
+   "metadata": {},
+   "source": [
+    "#### Cross Validation"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "5779d949-d0cd-41ee-829b-cd766cfabbc1",
+   "id": "5b1fbe4a-b7e6-4935-be41-97876b3fb7da",
    "metadata": {},
    "outputs": [],
    "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e423852a-8495-4ff4-803d-17d985c50ac3",
+   "metadata": {},
+   "source": [
+    "### Catbooster"
+   ]
   },
   {
    "cell_type": "code",
